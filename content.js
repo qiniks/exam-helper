@@ -18,7 +18,7 @@ function checkSelection() {
 }
 
 async function runOcr(rect, dpr) {
-  window.ExamOverlay.showMessage('Reading… (OCR)', false, 0);
+  window.ExamOverlay.showMessage('…', false, 0);
   let res;
   try {
     res = await chrome.runtime.sendMessage({ type: 'RUN_OCR', rect, dpr });
