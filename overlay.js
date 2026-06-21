@@ -30,75 +30,48 @@
     return n;
   }
 
-  function makeDraggable(panel, handle) {
-    let sx, sy, ox, oy, dragging = false;
-    handle.addEventListener('mousedown', (e) => {
-      dragging = true; sx = e.clientX; sy = e.clientY;
-      const r = panel.getBoundingClientRect(); ox = r.left; oy = r.top;
-      panel.style.right = 'auto'; panel.style.bottom = 'auto';
-      panel.style.left = ox + 'px'; panel.style.top = oy + 'px';
-      e.preventDefault();
-    });
-    window.addEventListener('mousemove', (e) => {
-      if (!dragging) return;
-      panel.style.left = (ox + e.clientX - sx) + 'px';
-      panel.style.top = (oy + e.clientY - sy) + 'px';
-    });
-    window.addEventListener('mouseup', () => { dragging = false; });
-  }
-
   async function renderPanel(buildBody) {
     const shadow = await ensureHost();
     const old = shadow.querySelector('.eh-panel');
     if (old) old.remove();
     const panel = el('div', 'eh-panel');
-    const header = el('div', 'eh-header');
-    header.appendChild(el('span', 'eh-title', 'Exam Helper'));
     const close = el('button', 'eh-close', '×');
     close.addEventListener('click', () => panel.remove());
-    header.appendChild(close);
-    panel.appendChild(header);
+    panel.appendChild(close);
     const body = el('div', 'eh-body');
     buildBody(body);
     panel.appendChild(body);
     shadow.appendChild(panel);
-    makeDraggable(panel, header);
   }
 
+  // Minimal, translucent overlay: shows ONLY the correct answer when confident,
+  // or the possible answers when the match is uncertain.
   function showResult(result, threshold) {
     return renderPanel((body) => {
       if (!result || !result.best) {
-        body.appendChild(el('div', 'eh-error', 'No questions to match against.'));
+        body.appendChild(el('div', 'eh-dim', 'no match'));
         return;
       }
       if (result.score < threshold) {
-        body.appendChild(el('div', 'eh-note eh-low', 'No confident match. Did you mean:'));
+        body.appendChild(el('div', 'eh-label', 'possible answers'));
         const ul = el('ul', 'eh-guesses');
         result.top.slice(0, 2).forEach((t) => {
           const a = window.ExamMatcher.resolveAnswer(t.cand);
-          const li = el('li');
-          li.textContent = `${t.cand.question}  →  ${a.text}  (${Math.round(t.score * 100)}%)`;
-          ul.appendChild(li);
+          ul.appendChild(el('li', null, a.text));
         });
         body.appendChild(ul);
         return;
       }
+      // resolveAnswer already returns the corrected option when the bank flagged
+      // a discrepancy, so this is always the actual correct answer.
       const ans = window.ExamMatcher.resolveAnswer(result.best);
-      body.appendChild(el('div', 'eh-q', result.best.question));
       body.appendChild(el('div', 'eh-answer', ans.text));
-      const meta = el('div', 'eh-meta');
-      meta.appendChild(el('span', null, `${Math.round(result.score * 100)}% match`));
-      meta.appendChild(el('span', null, result.best.subjectTitle));
-      body.appendChild(meta);
-      if (ans.corrected) {
-        body.appendChild(el('div', 'eh-note', 'Corrected answer (original key was wrong): ' + ans.note));
-      }
     });
   }
 
   function showMessage(msg, isError) {
     return renderPanel((body) => {
-      body.appendChild(el('div', isError ? 'eh-error' : 'eh-q', msg));
+      body.appendChild(el('div', isError ? 'eh-error' : 'eh-dim', msg));
     });
   }
 
