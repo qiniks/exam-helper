@@ -5,12 +5,15 @@
     const layer = document.createElement('div');
     Object.assign(layer.style, {
       position: 'fixed', left: 0, top: 0, right: 0, bottom: 0,
-      zIndex: 2147483646, cursor: 'crosshair', background: 'rgba(0,0,0,0.08)'
+      zIndex: 2147483646, cursor: 'crosshair', background: 'transparent'
     });
     const box = document.createElement('div');
     Object.assign(box.style, {
-      position: 'fixed', border: '2px solid #4da3ff',
-      background: 'rgba(77,163,255,0.15)', display: 'none', zIndex: 2147483646
+      // No fill/highlight — just a faint outline (white dashes + dark halo) so the
+      // marquee stays visible on any background while the zone itself is transparent.
+      position: 'fixed', border: '1px dashed rgba(255,255,255,0.9)',
+      boxShadow: '0 0 0 1px rgba(0,0,0,0.45)',
+      background: 'transparent', display: 'none', zIndex: 2147483646
     });
     layer.appendChild(box);
     document.documentElement.appendChild(layer);

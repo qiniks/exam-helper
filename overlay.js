@@ -2,7 +2,9 @@
   'use strict';
 
   const HOST_ID = 'exam-helper-overlay-host';
+  const DEFAULT_AUTOCLOSE_MS = 4500;
   let cssText = null;
+  let autoCloseTimer = null;
 
   async function ensureHost() {
     let host = document.getElementById(HOST_ID);
@@ -30,18 +32,29 @@
     return n;
   }
 
-  async function renderPanel(buildBody) {
+  function clearAutoClose() {
+    if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
+  }
+
+  async function renderPanel(buildBody, autoCloseMs) {
     const shadow = await ensureHost();
+    clearAutoClose();
     const old = shadow.querySelector('.eh-panel');
     if (old) old.remove();
     const panel = el('div', 'eh-panel');
     const close = el('button', 'eh-close', '×');
-    close.addEventListener('click', () => panel.remove());
+    close.addEventListener('click', () => { clearAutoClose(); panel.remove(); });
     panel.appendChild(close);
     const body = el('div', 'eh-body');
     buildBody(body);
     panel.appendChild(body);
     shadow.appendChild(panel);
+    if (autoCloseMs && autoCloseMs > 0) {
+      autoCloseTimer = setTimeout(() => {
+        if (panel.isConnected) panel.remove();
+        autoCloseTimer = null;
+      }, autoCloseMs);
+    }
   }
 
   // Minimal, translucent overlay: shows ONLY the correct answer when confident,
@@ -66,13 +79,14 @@
       // a discrepancy, so this is always the actual correct answer.
       const ans = window.ExamMatcher.resolveAnswer(result.best);
       body.appendChild(el('div', 'eh-answer', ans.text));
-    });
+    }, DEFAULT_AUTOCLOSE_MS);
   }
 
-  function showMessage(msg, isError) {
+  function showMessage(msg, isError, autoCloseMs) {
+    if (autoCloseMs === undefined) autoCloseMs = DEFAULT_AUTOCLOSE_MS;
     return renderPanel((body) => {
       body.appendChild(el('div', isError ? 'eh-error' : 'eh-dim', msg));
-    });
+    }, autoCloseMs);
   }
 
   window.ExamOverlay = { showResult, showMessage };
