@@ -1,0 +1,5 @@
+# Treat Tesseract WASM + compressed language data as binary so line-ending
+# normalization can never corrupt them on checkout.
+*.wasm binary
+*.gz binary
+*.traineddata binary
