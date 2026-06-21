@@ -6,6 +6,10 @@ function getWorker() {
   if (workerPromise) return workerPromise;
   workerPromise = (async () => {
     const worker = await Tesseract.createWorker(['rus', 'kir'], 1, {
+      // MV3: load the worker directly from the extension URL instead of the default
+      // blob: URL. A blob worker has an opaque origin and the extension CSP
+      // (script-src 'self') refuses its importScripts of chrome-extension:// scripts.
+      workerBlobURL: false,
       workerPath: chrome.runtime.getURL('vendor/tesseract/worker.min.js'),
       corePath: chrome.runtime.getURL('vendor/tesseract/core/'),
       langPath: chrome.runtime.getURL('vendor/tesseract/lang/'),
