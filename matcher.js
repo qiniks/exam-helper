@@ -48,7 +48,54 @@
     return 0.6 * dice + 0.4 * jac;
   }
 
-  const api = { normalize, trigrams, diceCoefficient, tokenJaccard, score };
+  function flattenBank(data) {
+    const out = [];
+    for (const subjectKey of Object.keys(data || {})) {
+      const subject = data[subjectKey] || {};
+      for (const t of subject.tests || []) {
+        for (const q of t.questions || []) {
+          out.push({
+            subjectKey,
+            subjectTitle: subject.title || subjectKey,
+            id: q.id,
+            question: q.question,
+            options: q.options || [],
+            answerIndex: q.answerIndex,
+            verification: q.verification || null
+          });
+        }
+      }
+    }
+    return out;
+  }
+
+  function findBest(query, flatBank, topN) {
+    topN = topN || 3;
+    const scored = flatBank.map((cand) => ({ cand, score: score(query, cand.question) }));
+    scored.sort((a, b) => b.score - a.score);
+    const top = scored.slice(0, topN);
+    return {
+      best: top.length ? top[0].cand : null,
+      score: top.length ? top[0].score : 0,
+      top
+    };
+  }
+
+  function resolveAnswer(cand) {
+    const v = cand.verification;
+    if (v && v.status === 'discrepancy' && Number.isInteger(v.actualAnswerIndex)) {
+      return {
+        text: cand.options[v.actualAnswerIndex],
+        index: v.actualAnswerIndex,
+        corrected: true,
+        note: v.note || ''
+      };
+    }
+    return { text: cand.options[cand.answerIndex], index: cand.answerIndex, corrected: false, note: '' };
+  }
+
+  const api = { normalize, trigrams, diceCoefficient, tokenJaccard, score, flattenBank, findBest, resolveAnswer };
+  api.CONFIDENCE_THRESHOLD = 0.55;
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else global.ExamMatcher = api;

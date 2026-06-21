@@ -46,3 +46,49 @@ test('score: handles empty input without throwing', () => {
   assert.strictEqual(M.score('', 'что-то'), 0);
   assert.strictEqual(M.score('что-то', ''), 0);
 });
+
+const TESTS_DATA = require('./data/tests_data.js');
+
+test('flattenBank flattens all subjects/tests into 228 entries', () => {
+  const flat = M.flattenBank(TESTS_DATA);
+  assert.strictEqual(flat.length, 228);
+  const first = flat[0];
+  assert.ok(first.question && Array.isArray(first.options));
+  assert.ok(typeof first.answerIndex === 'number');
+  assert.ok(first.subjectKey && first.subjectTitle);
+});
+
+test('findBest returns the exact question on exact text', () => {
+  const flat = M.flattenBank(TESTS_DATA);
+  const target = flat[1];
+  const res = M.findBest(target.question, flat);
+  assert.strictEqual(res.best.id, target.id);
+  assert.ok(res.score > 0.95, `score ${res.score}`);
+  assert.ok(Array.isArray(res.top) && res.top.length >= 2);
+});
+
+test('findBest still finds the right question with OCR-style noise', () => {
+  const flat = M.flattenBank(TESTS_DATA);
+  const target = flat[1];
+  const noisy = target.question.replace(/о/g, 'o');
+  const res = M.findBest(noisy, flat);
+  assert.strictEqual(res.best.id, target.id);
+});
+
+test('resolveAnswer returns options[answerIndex] normally', () => {
+  const flat = M.flattenBank(TESTS_DATA);
+  const q = flat.find((x) => !x.verification);
+  const a = M.resolveAnswer(q);
+  assert.strictEqual(a.text, q.options[q.answerIndex]);
+  assert.strictEqual(a.corrected, false);
+});
+
+test('resolveAnswer returns the corrected option when a discrepancy is flagged', () => {
+  const flat = M.flattenBank(TESTS_DATA);
+  const q = flat.find((x) => x.verification && x.verification.status === 'discrepancy');
+  assert.ok(q, 'expected at least one verification discrepancy in the bank');
+  const a = M.resolveAnswer(q);
+  assert.strictEqual(a.text, q.options[q.verification.actualAnswerIndex]);
+  assert.strictEqual(a.corrected, true);
+  assert.ok(a.note && a.note.length > 0);
+});
