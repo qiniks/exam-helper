@@ -4,9 +4,9 @@
   function start(onComplete) {
     const layer = document.createElement('div');
     Object.assign(layer.style, {
-      // Keep the normal (native) arrow cursor while selecting — no crosshair.
+      // Cursor shown while selecting a region (no crosshair, no visible box).
       position: 'fixed', left: 0, top: 0, right: 0, bottom: 0,
-      zIndex: 2147483646, cursor: 'default', background: 'transparent'
+      zIndex: 2147483646, cursor: 'grabbing', background: 'transparent'
     });
     const box = document.createElement('div');
     Object.assign(box.style, {
