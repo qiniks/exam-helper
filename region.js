@@ -9,11 +9,9 @@
     });
     const box = document.createElement('div');
     Object.assign(box.style, {
-      // No fill/highlight — just a faint outline (white dashes + dark halo) so the
-      // marquee stays visible on any background while the zone itself is transparent.
-      position: 'fixed', border: '1px dashed rgba(255,255,255,0.9)',
-      boxShadow: '0 0 0 1px rgba(0,0,0,0.45)',
-      background: 'transparent', display: 'none', zIndex: 2147483646
+      // Fully transparent selection zone — no outline, fill, or highlight.
+      position: 'fixed', border: 'none', background: 'transparent',
+      display: 'none', zIndex: 2147483646
     });
     layer.appendChild(box);
     document.documentElement.appendChild(layer);
