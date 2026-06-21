@@ -2574,3 +2574,4 @@ const TESTS_DATA = {
 };
 
 if (typeof module !== 'undefined' && module.exports) { module.exports = TESTS_DATA; }
+else if (typeof globalThis !== 'undefined') { globalThis.TESTS_DATA = TESTS_DATA; }
