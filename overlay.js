@@ -2,7 +2,7 @@
   'use strict';
 
   const HOST_ID = 'exam-helper-overlay-host';
-  const DEFAULT_AUTOCLOSE_MS = 4500;
+  const DEFAULT_AUTOCLOSE_MS = 1500;
   let cssText = null;
   let autoCloseTimer = null;
 
