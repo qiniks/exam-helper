@@ -5,7 +5,7 @@
   right: 16px;
   bottom: 16px;
   max-width: 340px;
-  padding: 8px 26px 8px 12px;
+  padding: 8px 12px;
   background: rgba(15, 15, 18, 0.42);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
@@ -15,13 +15,6 @@
   color: #fff;
   z-index: 2147483647;
 }
-
-.eh-close {
-  position: absolute; top: 3px; right: 6px;
-  border: none; background: transparent; color: rgba(255, 255, 255, 0.45);
-  font-size: 15px; line-height: 1; cursor: pointer; padding: 2px;
-}
-.eh-close:hover { color: #fff; }
 
 .eh-body { padding: 0; }
 

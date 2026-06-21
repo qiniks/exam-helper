@@ -75,20 +75,17 @@ test('findBest still finds the right question with OCR-style noise', () => {
   assert.strictEqual(res.best.id, target.id);
 });
 
-test('resolveAnswer returns options[answerIndex] normally', () => {
+test('formatAnswer returns options[answerIndex] when there is no verification', () => {
   const flat = M.flattenBank(TESTS_DATA);
   const q = flat.find((x) => !x.verification);
-  const a = M.resolveAnswer(q);
-  assert.strictEqual(a.text, q.options[q.answerIndex]);
-  assert.strictEqual(a.corrected, false);
+  assert.strictEqual(M.formatAnswer(q), q.options[q.answerIndex]);
 });
 
-test('resolveAnswer returns the corrected option when a discrepancy is flagged', () => {
+test('formatAnswer shows both answers (verification one in brackets) on a discrepancy', () => {
   const flat = M.flattenBank(TESTS_DATA);
-  const q = flat.find((x) => x.verification && x.verification.status === 'discrepancy');
-  assert.ok(q, 'expected at least one verification discrepancy in the bank');
-  const a = M.resolveAnswer(q);
-  assert.strictEqual(a.text, q.options[q.verification.actualAnswerIndex]);
-  assert.strictEqual(a.corrected, true);
-  assert.ok(a.note && a.note.length > 0);
+  const q = flat.find((x) => x.verification && x.verification.status === 'discrepancy'
+    && x.verification.actualAnswerIndex !== x.answerIndex);
+  assert.ok(q, 'expected a discrepancy with a different actualAnswerIndex in the bank');
+  const expected = q.options[q.answerIndex] + ' (' + q.options[q.verification.actualAnswerIndex] + ')';
+  assert.strictEqual(M.formatAnswer(q), expected);
 });

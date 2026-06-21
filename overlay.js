@@ -42,9 +42,6 @@
     const old = shadow.querySelector('.eh-panel');
     if (old) old.remove();
     const panel = el('div', 'eh-panel');
-    const close = el('button', 'eh-close', '×');
-    close.addEventListener('click', () => { clearAutoClose(); panel.remove(); });
-    panel.appendChild(close);
     const body = el('div', 'eh-body');
     buildBody(body);
     panel.appendChild(body);
@@ -69,16 +66,13 @@
         body.appendChild(el('div', 'eh-label', 'possible answers'));
         const ul = el('ul', 'eh-guesses');
         result.top.slice(0, 2).forEach((t) => {
-          const a = window.ExamMatcher.resolveAnswer(t.cand);
-          ul.appendChild(el('li', null, a.text));
+          ul.appendChild(el('li', null, window.ExamMatcher.formatAnswer(t.cand)));
         });
         body.appendChild(ul);
         return;
       }
-      // resolveAnswer already returns the corrected option when the bank flagged
-      // a discrepancy, so this is always the actual correct answer.
-      const ans = window.ExamMatcher.resolveAnswer(result.best);
-      body.appendChild(el('div', 'eh-answer', ans.text));
+      // formatAnswer shows the bank answer, plus any verification alternative in brackets.
+      body.appendChild(el('div', 'eh-answer', window.ExamMatcher.formatAnswer(result.best)));
     }, DEFAULT_AUTOCLOSE_MS);
   }
 

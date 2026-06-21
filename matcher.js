@@ -81,20 +81,20 @@
     };
   }
 
-  function resolveAnswer(cand) {
+  // Display string for a question's answer. When the bank flags a verification
+  // discrepancy whose actualAnswerIndex differs, both are shown: the original
+  // (bank) answer first, the verification alternative in brackets.
+  function formatAnswer(cand) {
+    const base = cand.options[cand.answerIndex];
     const v = cand.verification;
-    if (v && v.status === 'discrepancy' && Number.isInteger(v.actualAnswerIndex)) {
-      return {
-        text: cand.options[v.actualAnswerIndex],
-        index: v.actualAnswerIndex,
-        corrected: true,
-        note: v.note || ''
-      };
+    if (v && v.status === 'discrepancy' && Number.isInteger(v.actualAnswerIndex)
+        && v.actualAnswerIndex !== cand.answerIndex) {
+      return base + ' (' + cand.options[v.actualAnswerIndex] + ')';
     }
-    return { text: cand.options[cand.answerIndex], index: cand.answerIndex, corrected: false, note: '' };
+    return base;
   }
 
-  const api = { normalize, trigrams, diceCoefficient, tokenJaccard, score, flattenBank, findBest, resolveAnswer };
+  const api = { normalize, trigrams, diceCoefficient, tokenJaccard, score, flattenBank, findBest, formatAnswer };
   api.CONFIDENCE_THRESHOLD = 0.55;
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
