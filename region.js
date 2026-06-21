@@ -3,16 +3,10 @@
 
   function start(onComplete) {
     const layer = document.createElement('div');
-    // Small custom crosshair (14px, white halo + black lines so it shows on any
-    // background). The native `crosshair` cursor can't be resized via CSS.
-    const crosshairSvg = "<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'>"
-      + "<g stroke='#fff' stroke-width='3'><line x1='7' y1='0' x2='7' y2='14'/><line x1='0' y1='7' x2='14' y2='7'/></g>"
-      + "<g stroke='#000' stroke-width='1'><line x1='7' y1='0' x2='7' y2='14'/><line x1='0' y1='7' x2='14' y2='7'/></g>"
-      + "</svg>";
-    const cursorValue = "url('data:image/svg+xml;base64," + btoa(crosshairSvg) + "') 7 7, crosshair";
     Object.assign(layer.style, {
+      // Keep the normal (native) arrow cursor while selecting — no crosshair.
       position: 'fixed', left: 0, top: 0, right: 0, bottom: 0,
-      zIndex: 2147483646, cursor: cursorValue, background: 'transparent'
+      zIndex: 2147483646, cursor: 'default', background: 'transparent'
     });
     const box = document.createElement('div');
     Object.assign(box.style, {

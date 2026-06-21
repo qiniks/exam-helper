@@ -19,10 +19,9 @@ Tesseract.js. No internet connection, account, or API key is required.
 
 - **Selected text** is the most accurate. Highlight the question, press the shortcut.
 - **Scan a region** is for sites that block copy-paste. Press the shortcut, then drag
-  from one corner of the question to the opposite corner. The selection is invisible, so
-  drag "blind" — the small crosshair cursor tells you you're in scan mode. The first scan
-  after loading takes a few seconds while the OCR language data loads once; later scans
-  are fast.
+  from one corner of the question to the opposite corner. The selection is invisible and
+  the cursor stays normal, so you drag "blind." The first scan after loading takes a few
+  seconds while the OCR language data loads once; later scans are fast.
 - The overlay shows just the answer, then auto-closes after a moment. Click the **×** to
   dismiss it sooner.
 
