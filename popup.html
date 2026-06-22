@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h2>Appearance</h2>
+
+  <div class="field">
+    <label>Answer size <span id="answerFontSizeVal" class="val">11px</span></label>
+    <input type="range" id="answerFontSize" min="10" max="32" step="1" value="11">
+  </div>
+
+  <div class="field">
+    <label>Text size <span id="baseFontSizeVal" class="val">14px</span></label>
+    <input type="range" id="baseFontSize" min="10" max="24" step="1" value="14">
+  </div>
+
+  <div class="field">
+    <label>Font</label>
+    <select id="fontFamily">
+      <option value="system">System (default)</option>
+      <option value="mono">Monospace</option>
+      <option value="serif">Serif</option>
+    </select>
+  </div>
+
+  <div class="preview" id="preview">
+    <div class="preview-label">Preview</div>
+    <div class="preview-answer" id="previewAnswer">Correct answer text</div>
+  </div>
+
+  <button id="reset">Reset to defaults</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>

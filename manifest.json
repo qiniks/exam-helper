@@ -3,8 +3,9 @@
   "name": "Exam Prep Answer Checker",
   "version": "1.0.0",
   "description": "Self-study aid: check your answer against a bundled question bank via selected text or OCR. Offline.",
-  "permissions": ["offscreen", "activeTab"],
+  "permissions": ["offscreen", "activeTab", "storage"],
   "host_permissions": ["<all_urls>"],
+  "action": { "default_popup": "popup.html", "default_title": "Exam Helper Settings" },
   "background": { "service_worker": "background.js" },
   "commands": {
     "check-selection": {
