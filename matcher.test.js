@@ -47,11 +47,45 @@ test('score: handles empty input without throwing', () => {
   assert.strictEqual(M.score('что-то', ''), 0);
 });
 
-const TESTS_DATA = require('./data/tests_data.js');
+const SAMPLE_DATA = {
+  geography: {
+    title: "География",
+    tests: [
+      {
+        id: "geo_1",
+        title: "Тест 1",
+        questions: [
+          {
+            id: "geo_q1",
+            question: "Кыргызстан на севере граничит с каким государством?",
+            options: ["Казахстан", "Китай", "Россия", "Узбекистан"],
+            answerIndex: 0
+          },
+          {
+            id: "geo_q2",
+            question: "На каком горном хребте расположен пик Победы?",
+            options: ["Алайский", "Бозкыр", "Акшыйрак", "Сарыжазский"],
+            answerIndex: 3
+          },
+          {
+            id: "geo_q3",
+            question: "В каком месте Иссыккульской котловины добывается бурый уголь?",
+            options: ["Курменты", "Джергалан", "Сарыджаз", "Барскаун"],
+            answerIndex: 2,
+            verification: {
+              status: "discrepancy",
+              actualAnswerIndex: 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+};
 
-test('flattenBank flattens all subjects/tests into 228 entries', () => {
-  const flat = M.flattenBank(TESTS_DATA);
-  assert.strictEqual(flat.length, 228);
+test('flattenBank flattens all subjects/tests into entries', () => {
+  const flat = M.flattenBank(SAMPLE_DATA);
+  assert.strictEqual(flat.length, 3);
   const first = flat[0];
   assert.ok(first.question && Array.isArray(first.options));
   assert.ok(typeof first.answerIndex === 'number');
@@ -59,7 +93,7 @@ test('flattenBank flattens all subjects/tests into 228 entries', () => {
 });
 
 test('findBest returns the exact question on exact text', () => {
-  const flat = M.flattenBank(TESTS_DATA);
+  const flat = M.flattenBank(SAMPLE_DATA);
   const target = flat[1];
   const res = M.findBest(target.question, flat);
   assert.strictEqual(res.best.id, target.id);
@@ -68,7 +102,7 @@ test('findBest returns the exact question on exact text', () => {
 });
 
 test('findBest still finds the right question with OCR-style noise', () => {
-  const flat = M.flattenBank(TESTS_DATA);
+  const flat = M.flattenBank(SAMPLE_DATA);
   const target = flat[1];
   const noisy = target.question.replace(/о/g, 'o');
   const res = M.findBest(noisy, flat);
@@ -76,16 +110,25 @@ test('findBest still finds the right question with OCR-style noise', () => {
 });
 
 test('formatAnswer returns options[answerIndex] when there is no verification', () => {
-  const flat = M.flattenBank(TESTS_DATA);
+  const flat = M.flattenBank(SAMPLE_DATA);
   const q = flat.find((x) => !x.verification);
   assert.strictEqual(M.formatAnswer(q), q.options[q.answerIndex]);
 });
 
 test('formatAnswer shows both answers (verification one in brackets) on a discrepancy', () => {
-  const flat = M.flattenBank(TESTS_DATA);
+  const flat = M.flattenBank(SAMPLE_DATA);
   const q = flat.find((x) => x.verification && x.verification.status === 'discrepancy'
     && x.verification.actualAnswerIndex !== x.answerIndex);
   assert.ok(q, 'expected a discrepancy with a different actualAnswerIndex in the bank');
   const expected = q.options[q.answerIndex] + ' (' + q.options[q.verification.actualAnswerIndex] + ')';
   assert.strictEqual(M.formatAnswer(q), expected);
+});
+
+test('formatAnswer handles custom candidate with direct answer field and no options', () => {
+  const customCand = {
+    id: 'c1',
+    question: 'What is the speed of light?',
+    answer: '299,792 km/s'
+  };
+  assert.strictEqual(M.formatAnswer(customCand), '299,792 km/s');
 });

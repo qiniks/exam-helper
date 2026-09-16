@@ -2,10 +2,10 @@
 
 An **offline** Chrome extension that helps you self-check practice questions. Select a
 question's text (or screenshot it when copy-paste is disabled), and the correct answer
-appears in a small, translucent overlay in the corner of the page — matched against a
-bundled bank of 228 questions (География / История / Кыргызский язык, in Cyrillic).
+appears in a small, translucent overlay in the corner of the page — matched against your
+uploaded question bank.
 
-Everything runs locally: the question bank is built in, and OCR uses a bundled copy of
+Everything runs locally in your browser: questions are stored locally in Chrome storage, and OCR uses a bundled copy of
 Tesseract.js. No internet connection, account, or API key is required.
 
 ---
@@ -17,13 +17,12 @@ Tesseract.js. No internet connection, account, or API key is required.
 | **Alt + Shift + Q** | **⌥ Option + Shift + Q** | Check the **currently selected text** |
 | **Alt + Shift + S** | **⌥ Option + Shift + S** | **Scan a region**: drag a box around the question (OCR) |
 
-- **Selected text** is the most accurate. Highlight the question, press the shortcut.
-- **Scan a region** is for sites that block copy-paste. Press the shortcut, then drag
-  from one corner of the question to the opposite corner. The selection is invisible and
-  the cursor stays normal, so you drag "blind." The first scan after loading takes a few
-  seconds while the OCR language data loads once; later scans are fast.
-- The overlay shows just the answer, then auto-closes after a moment. Click the **×** to
-  dismiss it sooner.
+1. **Upload your questions first**: Click the extension icon in Chrome toolbar and upload your questions (JSON, CSV, TSV).
+2. **Selected text** is the most accurate. Highlight the question, press the shortcut.
+3. **Scan a region** is for sites that block copy-paste. Press the shortcut, then drag
+   from one corner of the question to the opposite corner.
+4. The overlay shows just the answer, then auto-closes after a moment. Click the **×** to
+   dismiss it sooner.
 
 > The overlay only **shows** the answer — it never clicks or changes anything on the page.
 
@@ -42,15 +41,12 @@ Chromium browsers.
 ### Windows
 
 1. Put the extension folder somewhere permanent, e.g. `C:\Users\<you>\Desktop\exam`.
-   (If you keep it in OneDrive, that's fine — just don't move it after loading, or
-   Chrome will lose track of it.)
 2. Open Chrome and go to `chrome://extensions` (type it in the address bar).
 3. Turn on **Developer mode** (toggle in the top-right corner).
 4. Click **Load unpacked**.
 5. Select the extension folder (the one that directly contains `manifest.json`) and click
    **Select Folder**.
-6. The card **Exam Prep Answer Checker** appears. You're done — open any page and use the
-   shortcuts above.
+6. The card **Exam Prep Answer Checker** appears. You're done.
 
 ### macOS
 
@@ -62,14 +58,62 @@ Chromium browsers.
    `manifest.json`) and click **Select**.
 6. The card **Exam Prep Answer Checker** appears. Use **⌥ Option + Shift + Q / S**.
 
-> On macOS, Chrome maps the extension's `Alt` shortcut to the **Option (⌥)** key.
+---
 
-### Verify it works
-1. Open `test/sample.html` from this folder in a Chrome tab (drag the file into Chrome).
-2. Highlight the first question's text and press the check-selection shortcut → you should
-   see **Сарыжазский** appear in the corner.
-3. Press the scan-region shortcut and drag a box around the second question → after a short
-   pause you should see **Бишкек**.
+## Uploading your questions
+
+You can upload questions directly from the extension popup:
+
+1. Click the **Exam Prep Answer Checker** extension icon in your Chrome toolbar.
+2. In the **Questions** tab, click the upload box (or drag and drop your file).
+3. The extension immediately parses and activates your questions across all open tabs!
+
+### Supported formats:
+
+- **Simple Q&A JSON** (flashcards / quiz lists):
+  ```json
+  [
+    { "question": "What is the capital of Iceland?", "answer": "Reykjavik" },
+    { "question": "What is the largest organ in the human body?", "answer": "Skin" }
+  ]
+  ```
+- **Multiple-Choice JSON**:
+  ```json
+  [
+    {
+      "question": "What is the capital of France?",
+      "options": ["London", "Berlin", "Paris", "Madrid"],
+      "answerIndex": 2
+    }
+  ]
+  ```
+- **CSV / TSV / Semicolon-delimited files**:
+  ```csv
+  Question,Answer,Option1,Option2,Option3,Option4
+  "What is the capital of France?","Paris","London","Berlin","Paris","Madrid"
+  "Which planet is known as the Red Planet?","Mars","","","",""
+  ```
+- **Nested format**:
+  ```json
+  {
+    "subjects": {
+      "title": "Subject Name",
+      "tests": [
+        {
+          "title": "Test 1",
+          "questions": [
+            { "question": "...", "options": ["..."], "answerIndex": 0 }
+          ]
+        }
+      ]
+    }
+  }
+  ```
+
+### Features:
+- **Export active bank**: Download the currently loaded bank as a JSON file.
+- **Sample Templates**: Click **Sample JSON** or **Sample CSV** at the bottom of the popup to get working example files.
+- **Clear question bank**: Clear all loaded questions anytime.
 
 ---
 
@@ -83,22 +127,9 @@ If the default shortcuts conflict with something else, change them:
 
 ---
 
-## Updating the question bank
-
-The questions live in `data/tests_data.js`. To refresh them from the prep site:
-
-1. Copy the site's `tests_data.js` over `data/tests_data.js`.
-2. Make sure the last two lines (the export shim) are still present:
-   ```js
-   if (typeof module !== 'undefined' && module.exports) { module.exports = TESTS_DATA; }
-   else if (typeof globalThis !== 'undefined') { globalThis.TESTS_DATA = TESTS_DATA; }
-   ```
-3. Go to `chrome://extensions` and click the **reload** (↻) icon on the extension card.
-
----
-
 ## Troubleshooting
 
+- **"No questions loaded."** Open the extension popup from your toolbar and upload your questions file.
 - **Changes don't show up.** After editing any extension file, click the **reload (↻)**
   icon on the extension's card at `chrome://extensions`.
 - **Nothing happens on a shortcut.** Some pages (the `chrome://` pages, the Chrome Web
@@ -114,7 +145,7 @@ The questions live in `data/tests_data.js`. To refresh them from the prep site:
 ## What's inside (for the curious)
 
 - `manifest.json` — extension configuration (Manifest V3).
-- `data/tests_data.js` — the bundled 228-question bank.
+- `bank.js` — question bank parser, template generator, and normalization logic.
 - `matcher.js` — fuzzy matching of your text against the bank (with unit tests in
   `matcher.test.js`; run `node --test`).
 - `content.js`, `region.js`, `overlay.js`, `ui/overlay.css` — on-page logic and the overlay.

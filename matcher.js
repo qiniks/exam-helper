@@ -81,17 +81,20 @@
     };
   }
 
-  // Display string for a question's answer. When the bank flags a verification
-  // discrepancy whose actualAnswerIndex differs, both are shown: the original
-  // (bank) answer first, the verification alternative in brackets.
+  // Display string for a question's answer. Supports both multiple-choice options
+  // and direct answer strings (e.g. from user-uploaded flashcards or CSVs).
   function formatAnswer(cand) {
-    const base = cand.options[cand.answerIndex];
+    if (!cand) return '';
+    const hasOptions = Array.isArray(cand.options) && cand.options.length > 0;
+    const base = (hasOptions && Number.isInteger(cand.answerIndex) && cand.options[cand.answerIndex] != null)
+      ? cand.options[cand.answerIndex]
+      : (cand.answer || (hasOptions ? cand.options[0] : ''));
     const v = cand.verification;
     if (v && v.status === 'discrepancy' && Number.isInteger(v.actualAnswerIndex)
-        && v.actualAnswerIndex !== cand.answerIndex) {
+        && hasOptions && v.actualAnswerIndex !== cand.answerIndex && cand.options[v.actualAnswerIndex] != null) {
       return base + ' (' + cand.options[v.actualAnswerIndex] + ')';
     }
-    return base;
+    return String(base);
   }
 
   const api = { normalize, trigrams, diceCoefficient, tokenJaccard, score, flattenBank, findBest, formatAnswer };

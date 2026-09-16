@@ -5,34 +5,80 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h2>Appearance</h2>
-
-  <div class="field">
-    <label>Answer size <span id="answerFontSizeVal" class="val">11px</span></label>
-    <input type="range" id="answerFontSize" min="10" max="32" step="1" value="11">
+  <div class="header">
+    <div class="logo-title">Exam Answer Checker</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-questions">Questions</button>
+      <button class="tab-btn" data-tab="tab-appearance">Appearance</button>
+    </div>
   </div>
 
-  <div class="field">
-    <label>Text size <span id="baseFontSizeVal" class="val">14px</span></label>
-    <input type="range" id="baseFontSize" min="10" max="24" step="1" value="14">
+  <!-- Questions Tab -->
+  <div id="tab-questions" class="tab-content active">
+    <div class="bank-card">
+      <div class="bank-card-title">Active Question Bank</div>
+      <div class="bank-status-row">
+        <span id="bankBadge" class="badge badge-empty">Empty</span>
+        <span id="bankCount" class="bank-count">0 questions</span>
+      </div>
+      <div id="bankDetails" class="bank-details">No questions loaded. Upload a file below.</div>
+    </div>
+
+    <div class="upload-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".json,.csv,.tsv,.txt" style="display: none;">
+      <div class="upload-icon">📂</div>
+      <div class="upload-prompt"><strong>Click to upload</strong> or drag & drop</div>
+      <div class="upload-hint">Supports JSON, CSV, TSV (Q&A or choices)</div>
+    </div>
+
+    <div id="statusMsg" class="status-msg" style="display: none;"></div>
+
+    <div class="btn-group">
+      <button id="clearBankBtn" class="btn-secondary" style="display: none;">Clear question bank</button>
+      <button id="exportBankBtn" class="btn-secondary" style="display: none;">Export active bank (JSON)</button>
+    </div>
+
+    <div class="templates-section">
+      <div class="templates-label">Sample Templates:</div>
+      <div class="template-links">
+        <button id="templateJsonBtn" class="link-btn">Sample JSON</button>
+        <span class="separator">•</span>
+        <button id="templateCsvBtn" class="link-btn">Sample CSV</button>
+      </div>
+    </div>
   </div>
 
-  <div class="field">
-    <label>Font</label>
-    <select id="fontFamily">
-      <option value="system">System (default)</option>
-      <option value="mono">Monospace</option>
-      <option value="serif">Serif</option>
-    </select>
+  <!-- Appearance Tab -->
+  <div id="tab-appearance" class="tab-content">
+    <div class="field">
+      <label>Answer size <span id="answerFontSizeVal" class="val">11px</span></label>
+      <input type="range" id="answerFontSize" min="10" max="32" step="1" value="11">
+    </div>
+
+    <div class="field">
+      <label>Text size <span id="baseFontSizeVal" class="val">14px</span></label>
+      <input type="range" id="baseFontSize" min="10" max="24" step="1" value="14">
+    </div>
+
+    <div class="field">
+      <label>Font</label>
+      <select id="fontFamily">
+        <option value="system">System (default)</option>
+        <option value="mono">Monospace</option>
+        <option value="serif">Serif</option>
+      </select>
+    </div>
+
+    <div class="preview" id="preview">
+      <div class="preview-label">Preview</div>
+      <div class="preview-answer" id="previewAnswer">Correct answer text</div>
+    </div>
+
+    <button id="reset" class="btn-secondary">Reset appearance defaults</button>
   </div>
 
-  <div class="preview" id="preview">
-    <div class="preview-label">Preview</div>
-    <div class="preview-answer" id="previewAnswer">Correct answer text</div>
-  </div>
-
-  <button id="reset">Reset to defaults</button>
-
+  <script src="matcher.js"></script>
+  <script src="bank.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

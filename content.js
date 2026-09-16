@@ -1,14 +1,38 @@
 'use strict';
 
-const FLAT_BANK = window.ExamMatcher.flattenBank(window.TESTS_DATA);
 const THRESHOLD = window.ExamMatcher.CONFIDENCE_THRESHOLD;
+let activeBank = [];
+
+function refreshActiveBank(data) {
+  const custom = data && data.customQuestionBank;
+  if (Array.isArray(custom) && custom.length > 0) {
+    activeBank = custom;
+  } else {
+    activeBank = [];
+  }
+}
+
+// Initial bank load from local storage
+if (chrome.storage && chrome.storage.local) {
+  chrome.storage.local.get(['customQuestionBank'], refreshActiveBank);
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && ('customQuestionBank' in changes)) {
+      chrome.storage.local.get(['customQuestionBank'], refreshActiveBank);
+    }
+  });
+}
 
 function checkText(text) {
   if (!text || !text.trim()) {
     window.ExamOverlay.showMessage('Select the question text first, then press Alt+Shift+Q.');
     return;
   }
-  const result = window.ExamMatcher.findBest(text, FLAT_BANK);
+  if (!activeBank || activeBank.length === 0) {
+    window.ExamOverlay.showMessage('No questions loaded. Open the extension popup to upload questions.', true, 3000);
+    return;
+  }
+  const result = window.ExamMatcher.findBest(text, activeBank);
   window.ExamOverlay.showResult(result, THRESHOLD);
 }
 
