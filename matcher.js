@@ -2,14 +2,13 @@
   'use strict';
 
   const HOMOGLYPH = {
-    a: 'а', c: 'с', e: 'е', o: 'о', p: 'р', x: 'х', y: 'у', k: 'к', m: 'м', t: 'т'
+    'а': 'a', 'с': 'c', 'е': 'e', 'ё': 'e', 'о': 'o', 'р': 'p', 'х': 'x', 'у': 'y', 'к': 'k', 'м': 'm', 'т': 't', 'і': 'i', 'ј': 'j'
   };
 
   function normalize(s) {
     if (!s) return '';
     s = String(s).toLowerCase();
-    s = s.replace(/ё/g, 'е');
-    s = s.replace(/[aceopxykmt]/g, (ch) => HOMOGLYPH[ch] || ch);
+    s = s.replace(/[асеёорхукмтіј]/g, (ch) => HOMOGLYPH[ch] || ch);
     s = s.replace(/[^\p{L}\p{N}\s]/gu, ' ');
     s = s.replace(/\s+/g, ' ').trim();
     return s;

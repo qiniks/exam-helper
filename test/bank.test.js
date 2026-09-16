@@ -111,13 +111,13 @@ test('parseQuestionData handles TSV with tab delimiter', () => {
 });
 
 test('parseQuestionData handles semicolon-separated values', () => {
-  const ssv = "Вопрос;Ответ\nСколько дней в году?;365\nСтолица КР;Бишкек";
+  const ssv = "Question;Answer\nHow many days in a year?;365\nCapital of France;Paris";
   const result = Bank.parseQuestionData(ssv);
   assert.strictEqual(result.length, 2);
-  assert.strictEqual(result[0].question, 'Сколько дней в году?');
+  assert.strictEqual(result[0].question, 'How many days in a year?');
   assert.strictEqual(result[0].answer, '365');
-  assert.strictEqual(result[1].question, 'Столица КР');
-  assert.strictEqual(result[1].answer, 'Бишкек');
+  assert.strictEqual(result[1].question, 'Capital of France');
+  assert.strictEqual(result[1].answer, 'Paris');
 });
 
 test('parseQuestionData throws error on invalid or empty input', () => {
